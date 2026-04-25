@@ -57,6 +57,49 @@ def fetch_reddit(keyword):
     except Exception as e:
         print(f"[Reddit error] {e}")
         return []
+    
+# ─── ProductHunt ───────────────────────────────────────────
+
+def fetch_producthunt(keyword):
+    """搜索ProductHunt上包含关键词的产品"""
+    url = "https://api.producthunt.com/v2/api/graphql"
+    headers = {
+        "Authorization": f"Bearer i7okzzzoWiVuGQ9b9AhIvHXDH1oMKfn287YzD-rAWyY",
+        "Content-Type": "application/json",
+    }
+    query = """
+    {
+      posts(query: "%s", first: 10, order: NEWEST) {
+        edges {
+          node {
+            id
+            name
+            tagline
+            url
+            createdAt
+          }
+        }
+      }
+    }
+    """ % keyword
+
+    try:
+        res = requests.post(url, json={"query": query}, headers=headers, timeout=10)
+        res.raise_for_status()
+        edges = res.json().get("data", {}).get("posts", {}).get("edges", [])
+        results = []
+        for edge in edges:
+            node = edge["node"]
+            results.append({
+                "source": "ProductHunt",
+                "title": f"{node['name']} — {node['tagline']}",
+                "url": node["url"],
+                "author": "",
+            })
+        return results
+    except Exception as e:
+        print(f"[ProductHunt error] {e}")
+        return []
 
 # ─── 统一入口 ──────────────────────────────────────────────
 
