@@ -50,7 +50,8 @@
             margin-bottom: 6px;
         }
 
-        input {
+        input[type="email"],
+        input[type="text"] {
             width: 100%;
             padding: 12px 16px;
             border: 1.5px solid #e0e0e0;
@@ -62,13 +63,58 @@
             outline: none;
         }
 
-        input:focus { border-color: #4F46E5; }
+        input[type="email"]:focus,
+        input[type="text"]:focus { border-color: #4F46E5; }
 
         .hint {
             font-size: 12px;
             color: #999;
             margin-top: -12px;
             margin-bottom: 16px;
+        }
+
+        .platforms {
+            margin-bottom: 24px;
+        }
+
+        .platform-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .platform-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .platform-option:hover {
+            border-color: #4F46E5;
+        }
+
+        .platform-option.selected {
+            border-color: #4F46E5;
+            background: #eef2ff;
+        }
+
+        .platform-option input[type="checkbox"] {
+            display: none;
+        }
+
+        .platform-icon { font-size: 16px; }
+
+        .platform-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
         }
 
         button {
@@ -117,7 +163,6 @@
 
         .feature { flex: 1; text-align: center; }
         .feature-icon { font-size: 20px; margin-bottom: 4px; }
-
         .feature-text {
             font-size: 12px;
             color: #888;
@@ -137,6 +182,22 @@
         <label>Keywords to Monitor</label>
         <input type="text" id="keywords" placeholder="solopreneur, indie hacker, ...">
         <p class="hint">Separate multiple keywords with commas</p>
+
+        <div class="platforms">
+            <label>Platforms</label>
+            <div class="platform-options">
+                <div class="platform-option selected" data-platform="reddit" onclick="togglePlatform(this)">
+                    <input type="checkbox" checked>
+                    <span class="platform-icon">🟠</span>
+                    <span class="platform-name">Reddit</span>
+                </div>
+                <div class="platform-option selected" data-platform="hackernews" onclick="togglePlatform(this)">
+                    <input type="checkbox" checked>
+                    <span class="platform-icon">🟡</span>
+                    <span class="platform-name">HackerNews</span>
+                </div>
+            </div>
+        </div>
 
         <button id="btn" onclick="subscribe()">Start Monitoring</button>
 
@@ -159,14 +220,30 @@
     </div>
 
     <script>
+        function togglePlatform(el) {
+            el.classList.toggle("selected");
+            const cb = el.querySelector("input[type='checkbox']");
+            cb.checked = !cb.checked;
+        }
+
+        function getSelectedPlatforms() {
+            const selected = document.querySelectorAll(".platform-option.selected");
+            return Array.from(selected).map(el => el.dataset.platform).join(",");
+        }
+
         async function subscribe() {
             const email = document.getElementById("email").value.trim();
             const keywords = document.getElementById("keywords").value.trim();
+            const platforms = getSelectedPlatforms();
             const btn = document.getElementById("btn");
-            const msg = document.getElementById("message");
 
             if (!email || !keywords) {
                 showMessage("Please enter your email and at least one keyword.", "error");
+                return;
+            }
+
+            if (!platforms) {
+                showMessage("Please select at least one platform.", "error");
                 return;
             }
 
@@ -177,7 +254,7 @@
                 const res = await fetch("/subscribe", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, keywords })
+                    body: JSON.stringify({ email, keywords, platforms })
                 });
                 const data = await res.json();
 

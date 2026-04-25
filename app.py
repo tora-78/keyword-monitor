@@ -13,17 +13,20 @@ def subscribe():
     data = request.get_json()
     email = data.get("email", "").strip()
     keywords = data.get("keywords", "").strip()
+    platforms = data.get("platforms", "reddit,hackernews").strip()
 
     if not email or not keywords:
-        return jsonify({"error": "邮箱和关键词不能为空"}), 400
+        return jsonify({"error": "Email and keywords are required"}), 400
 
-    # 支持多个关键词，用逗号分隔
+    if not platforms:
+        return jsonify({"error": "Please select at least one platform"}), 400
+
     keyword_list = [k.strip() for k in keywords.split(",") if k.strip()]
 
     for keyword in keyword_list:
-        add_subscription(email, keyword)
+        add_subscription(email, keyword, platforms)
 
-    return jsonify({"success": True, "message": f"成功订阅 {len(keyword_list)} 个关键词"})
+    return jsonify({"success": True, "message": f"Subscribed to {len(keyword_list)} keyword(s)"})
 
 @app.route("/subscriptions", methods=["GET"])
 def subscriptions():
