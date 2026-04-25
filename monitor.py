@@ -1,10 +1,11 @@
-from scraper import fetch_hn, fetch_reddit
+from scraper import fetch_hn, fetch_reddit, fetch_devto
 from database import init_db, get_all_subscriptions, is_already_sent, mark_as_sent
 from mailer import send_alert
 
 PLATFORM_FETCHERS = {
     "reddit": fetch_reddit,
     "hackernews": fetch_hn,
+    "devto": fetch_devto,
 }
 
 def run():

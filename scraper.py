@@ -58,47 +58,31 @@ def fetch_reddit(keyword):
         print(f"[Reddit error] {e}")
         return []
     
-# ─── ProductHunt ───────────────────────────────────────────
+# ─── DEV.to ───────────────────────────────────────────────
 
-def fetch_producthunt(keyword):
-    """搜索ProductHunt上包含关键词的产品"""
-    url = "https://api.producthunt.com/v2/api/graphql"
-    headers = {
-        "Authorization": f"Bearer i7okzzzoWiVuGQ9b9AhIvHXDH1oMKfn287YzD-rAWyY",
-        "Content-Type": "application/json",
+def fetch_devto(keyword):
+    """Search DEV.to articles by keyword"""
+    url = "https://dev.to/api/articles"
+    params = {
+        "tag": keyword.replace(" ", ""),
+        "per_page": 10,
+        "state": "fresh"
     }
-    query = """
-    {
-      posts(query: "%s", first: 10, order: NEWEST) {
-        edges {
-          node {
-            id
-            name
-            tagline
-            url
-            createdAt
-          }
-        }
-      }
-    }
-    """ % keyword
-
     try:
-        res = requests.post(url, json={"query": query}, headers=headers, timeout=10)
+        res = requests.get(url, params=params, timeout=10)
         res.raise_for_status()
-        edges = res.json().get("data", {}).get("posts", {}).get("edges", [])
+        articles = res.json()
         results = []
-        for edge in edges:
-            node = edge["node"]
+        for a in articles:
             results.append({
-                "source": "ProductHunt",
-                "title": f"{node['name']} — {node['tagline']}",
-                "url": node["url"],
-                "author": "",
+                "source": "DEV.to",
+                "title": a.get("title", ""),
+                "url": a.get("url", ""),
+                "author": a.get("user", {}).get("name", ""),
             })
         return results
     except Exception as e:
-        print(f"[ProductHunt error] {e}")
+        print(f"[DEV.to error] {e}")
         return []
 
 # ─── 统一入口 ──────────────────────────────────────────────
