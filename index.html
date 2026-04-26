@@ -267,6 +267,8 @@
                     showMessage("✅ You're subscribed! We'll email you when we find new mentions.", "success");
                     document.getElementById("email").value = "";
                     document.getElementById("keywords").value = "";
+                } else if (data.error === "free_limit") {
+                    showUpgradePrompt(email);
                 } else {
                     showMessage(data.error || "Something went wrong. Please try again.", "error");
                 }
@@ -276,6 +278,31 @@
 
             btn.disabled = false;
             btn.textContent = "Start Monitoring";
+        }
+
+        async function showUpgradePrompt(email) {
+            const msg = document.getElementById("message");
+            msg.innerHTML = `
+                <strong>Free plan allows 1 keyword only.</strong><br>
+                Upgrade to Pro ($3/mo) for unlimited keywords.<br><br>
+                <button onclick="upgrade('${email}')" style="width:auto;padding:10px 24px;font-size:14px;">
+                    ⚡ Upgrade to Pro
+                </button>
+            `;
+            msg.className = "message error";
+            msg.style.display = "block";
+        }
+
+        async function upgrade(email) {
+            const res = await fetch("/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email })
+            });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            }
         }
 
         function showMessage(text, type) {
