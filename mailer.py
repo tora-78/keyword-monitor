@@ -12,9 +12,7 @@ def send_alert(to_email, keyword, results):
         return
 
     # 拼装邮件内容
-    items_html = ""
-    for r in results:
-        items_html += f"""
+    items_html += f"""
         <div style="margin-bottom:16px; padding:12px; border-left:3px solid #4F46E5;">
             <a href="{r['url']}" style="font-size:15px; color:#4F46E5; text-decoration:none;">
                 {r['title']}
@@ -27,12 +25,12 @@ def send_alert(to_email, keyword, results):
 
     html = f"""
     <div style="font-family:sans-serif; max-width:600px; margin:0 auto;">
-        <h2 style="color:#1a1a1a;">🔔 关键词提醒：<em>{keyword}</em></h2>
-        <p style="color:#444;">发现 {len(results)} 条新内容：</p>
+        <h2 style="color:#1a1a1a;">🔔 Keyword Alert: <em>{keyword}</em></h2>
+        <p style="color:#444;">Found {len(results)} new mention(s):</p>
         {items_html}
         <hr style="border:none; border-top:1px solid #eee; margin:24px 0;">
         <p style="color:#999; font-size:12px;">
-            你收到此邮件是因为你订阅了关键词监控服务。
+            You're receiving this because you subscribed to Keyword Monitor.
         </p>
     </div>
     """
@@ -40,7 +38,7 @@ def send_alert(to_email, keyword, results):
     params = {
         "from": FROM_EMAIL,
         "to": [to_email],
-        "subject": f"[关键词监控] 发现关于 '{keyword}' 的新内容",
+        "subject": f"[Keyword Monitor] New mentions of '{keyword}'",
         "html": html,
     }
 
