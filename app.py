@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, redirect
-from database import init_db, add_subscription, get_all_subscriptions
+from database import init_db, add_subscription, get_all_subscriptions, count_subscriptions
 from payments import create_checkout_session, is_paid_user
 import os
 
@@ -25,12 +25,14 @@ def subscribe():
 
     keyword_list = [k.strip() for k in keywords.split(",") if k.strip()]
 
-    # 免费用户限1个关键词
-    if not is_paid_user(email) and len(keyword_list) > 1:
-        return jsonify({
-            "error": "free_limit",
-            "message": "Free plan allows 1 keyword only. Upgrade to Pro for unlimited keywords."
-        }), 403
+    # 检查免费用户总关键词数量
+    if not is_paid_user(email):
+        existing = count_subscriptions(email)
+        if existing >= 1 or len(keyword_list) > 1:
+            return jsonify({
+                "error": "free_limit",
+                "message": "Free plan allows 1 keyword only. Upgrade to Pro for unlimited keywords."
+            }), 403
 
     for keyword in keyword_list:
         add_subscription(email, keyword, platforms)

@@ -81,3 +81,12 @@ def mark_as_sent(url):
         pass
     finally:
         con.close()
+
+def count_subscriptions(email):
+    """统计某个邮箱已有的关键词数量"""
+    con = sqlite3.connect(DB_PATH)
+    cur = con.cursor()
+    cur.execute("SELECT COUNT(*) FROM subscriptions WHERE email=?", (email,))
+    count = cur.fetchone()[0]
+    con.close()
+    return count
