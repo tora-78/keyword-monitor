@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
-PRICE_ID = "price_1TQO9R9WjyRvy5cFUf2joVfC"
+PRICE_ID = "price_1TQOjN9kxypFQX5lcogqnsv6"
 SUCCESS_URL = os.getenv("BASE_URL", "https://keyword-monitor-production.up.railway.app") + "/success"
 CANCEL_URL = os.getenv("BASE_URL", "https://keyword-monitor-production.up.railway.app") + "/cancel"
 
