@@ -78,12 +78,12 @@ def subscriptions():
         result = [{"email": e, "keyword": k} for e, k, p in all_subs]
     return jsonify(result)
 
-if __name__ == "__main__":
-    init_db()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
-
 @app.route("/tokusho")
 def tokusho():
     with open("tokusho.html", "r", encoding="utf-8") as f:
         return f.read()
+
+if __name__ == "__main__":
+    init_db()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
